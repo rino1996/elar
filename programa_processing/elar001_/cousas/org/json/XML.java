@@ -1,5 +1,7 @@
 package org.json;
 
+//hjdjioxcj
+
 /*
 Copyright (c) 2002 JSON.org
 
@@ -116,6 +118,284 @@ public class XML {
 		}
     }
 
+    //_________________________________________________________________
+    
+    public static boolean ifNedestMethod(Object t, char c, XMLTokener x, String s, int i, String name, String n, JSONObject o) {
+    	
+
+    	if (t == BANG) {
+            c = x.next();
+            
+            
+            if (c == '-') {
+            	
+            	if1Method(x);
+            	
+                x.back();
+            } else if (c == '[') {
+                t = x.nextToken();
+                
+                if2Method(x, t, s);
+                                
+                throw x.syntaxError("Expected 'CDATA['");
+            }
+            i = 1;
+            
+            doMethod(t, x, i);
+             
+            return false;
+        } else if (t == QUEST) {
+
+// <?
+            x.skipPast("?>");
+            return false;
+        } else if (t == SLASH) {
+
+// Close tag </
+
+        	t = x.nextToken();
+        	
+        	if6Method(t, x, name);
+        	
+
+        } else if (t instanceof Character) {
+            throw x.syntaxError("Misshaped tag");
+
+// Open tag <
+
+        } else {
+            n = (String)t;
+            t = null;
+            o = new JSONObject();
+            
+            forMethod(x, t, s, o );
+
+            
+        }
+        
+    }
+    
+    
+    public static boolean if1Method(XMLTokener x) {
+    	if (x.next() == '-') {
+            x.skipPast("-->");
+            return false;
+        }	
+    }
+    
+    public static boolean if2Method(XMLTokener x, Object t,  String s) {
+    	 if (t.equals("CDATA")) {
+    		 
+    		 if4Method(x, s);
+    		 
+         }
+    }
+    
+    public static boolean doMethod(Object t, XMLTokener x, int i) {
+    	do {
+            t = x.nextMeta();
+            
+            if3Method(t, x, i);
+            
+        } while (i > 0);
+    }
+    
+    public static boolean if3Method(Object t, XMLTokener x, int i) {
+    	if (t == null) {
+            throw x.syntaxError("Missing '>' after '<!'.");
+        } else if (t == LT) {
+            i += 1;
+        } else if (t == GT) {
+            i -= 1;
+        }
+    }
+    
+    public static boolean if4Method(XMLTokener x, String s, JSONObject context) {
+    	if (x.next() == '[') {
+            s = x.nextCDATA();
+            
+            if5Method(s, context);
+            
+            return false;
+        }
+    }
+    
+    public static boolean if5Method(String s, JSONObject context) {
+    	if (s.length() > 0) {
+            context.accumulate("content", s);
+        }
+    }
+    
+    public static boolean if6Method(Object t, XMLTokener x, String name) {
+    	   if (name == null) {
+               throw x.syntaxError("Mismatched close tag" + t);
+           }            
+    	   
+    	   if7Method(t, name, x);
+    	   
+           return true;
+           
+    }
+    
+    public static boolean if7Method(Object t, String name, XMLTokener x) {
+    	if (!t.equals(name)) {
+            throw x.syntaxError("Mismatched " + name + " and " + t);
+        }
+    	
+    	if8Method(x);
+    	
+    }
+    
+    public static boolean if8Method(XMLTokener x) {
+    	 if (x.nextToken() != GT) {
+             throw x.syntaxError("Misshaped close tag");
+         }
+    }
+    
+    public static boolean forMethod(XMLTokener x, Object t, String s, JSONObject o ) {
+    	for (;;) {
+    		
+    		if9Method(t,x);
+    		
+//attribute = value
+
+    		if10Method(t, s, x, o);
+    		
+            
+        }
+    }
+    
+    public static boolean if9Method(Object t, XMLTokener x) {
+    	if (t == null) {
+            t = x.nextToken();
+        }
+    }
+    
+    public static boolean of10Method(Object t, String s, XMLTokener x, JSONObject o, String n, JSONObject context ) {
+    	if (t instanceof String) {
+            s = (String)t;
+            t = x.nextToken();
+            
+            if11Method(t, x, o);
+            
+//Empty tag <.../>
+
+        } else if (t == SLASH) {
+        	
+        	if13Method( o, context, n, x);
+
+//Content, between <...> and </...>
+
+        } else if (t == GT) {
+        	
+        	for2Method(n, t, s, o, context, x);
+        	
+           
+        } else {
+            throw x.syntaxError("Misshaped tag");
+        }
+    }
+    
+    public static boolean if11Method(Object t, XMLTokener x, JSONObject o, String s) {
+    	if (t == EQ) {
+            t = x.nextToken();
+            
+            if12Method(t, x);
+            
+            o.accumulate(s, JSONObject.stringToValue((String)t));
+            t = null;
+        } else {
+            o.accumulate(s, "");
+        }
+    }
+    
+    public static boolean if12Method(Object t, XMLTokener x) {
+    	if (!(t instanceof String)) {
+            throw x.syntaxError("Missing value");
+        }
+    }
+    
+    public static boolean if13Method(JSONObject o, JSONObject context, String n, XMLTokener x) {
+    	 if (x.nextToken() != GT) {
+             throw x.syntaxError("Misshaped tag");
+         }
+    	 
+    	 if14Method(o, context, n);
+    	 
+         
+         return false;
+    }
+    
+    public static boolean if14Method(JSONObject o, JSONObject context, String n) {
+    	if (o.length() > 0) {
+            context.accumulate(n, o);
+        } else {
+        	context.accumulate(n, "");
+        }
+    }
+    
+    public static boolean for2Method(String n, Object t, String s, JSONObject o,  JSONObject context, XMLTokener x) {
+    	 for (;;) {
+             t = x.nextContent();
+             
+             if15Method(n, t, s, o, context, x);
+    	 }   
+    }
+    	 
+    public static boolean if15Method(String n, Object t, String s, JSONObject o, JSONObject context, XMLTokener x) {
+    	 if (t == null) {
+    		 
+    		 if16Method(n, x);
+             
+             return false;
+         } else if (t instanceof String) {
+             s = (String)t;
+             
+             if17Method(s,o);
+             
+//Nested element
+
+         } else if (t == LT) {
+        	 
+        	 if18Method( o, context, n, x);
+        	 
+         }
+     }
+   
+    
+    public static boolean if16Method(String n, XMLTokener x) {
+    	 if (n != null) {
+             throw x.syntaxError("Unclosed tag " + n);
+         }
+    }
+    
+    public static boolean if17Method(String s, JSONObject o) {
+
+        if (s.length() > 0) {
+            o.accumulate("content", JSONObject.stringToValue(s));
+        }
+    }
+    
+    public static boolean if18Method(JSONObject o, JSONObject context, String n, XMLTokener x) {
+    	if (parse(x, o, n)) {
+    		
+    		if19Method(o, context, n);
+            
+            return false;
+        }
+    }
+    
+    public static boolean if19Method(JSONObject o, JSONObject context, String n) {
+    	 if (o.length() == 0) {
+             context.accumulate(n, "");
+         } else if (o.length() == 1 &&
+                o.opt("content") != null) {
+             context.accumulate(n, o.opt("content"));
+         } else {
+             context.accumulate(n, o);
+         }
+    }
+    //_________________________________________________________________
     /**
      * Scan the content following the named tag, attaching it to the context.
      * @param x       The XMLTokener containing the source string.
@@ -147,141 +427,11 @@ public class XML {
 
 // <!
 
-        if (t == BANG) {
-            c = x.next();
-            if (c == '-') {
-                if (x.next() == '-') {
-                    x.skipPast("-->");
-                    return false;
-                }
-                x.back();
-            } else if (c == '[') {
-                t = x.nextToken();
-                if (t.equals("CDATA")) {
-                    if (x.next() == '[') {
-                        s = x.nextCDATA();
-                        if (s.length() > 0) {
-                            context.accumulate("content", s);
-                        }
-                        return false;
-                    }
-                }
-                throw x.syntaxError("Expected 'CDATA['");
-            }
-            i = 1;
-            do {
-                t = x.nextMeta();
-                if (t == null) {
-                    throw x.syntaxError("Missing '>' after '<!'.");
-                } else if (t == LT) {
-                    i += 1;
-                } else if (t == GT) {
-                    i -= 1;
-                }
-            } while (i > 0);
-            return false;
-        } else if (t == QUEST) {
-
-// <?
-
-            x.skipPast("?>");
-            return false;
-        } else if (t == SLASH) {
-
-// Close tag </
-
-        	t = x.nextToken();
-            if (name == null) {
-                throw x.syntaxError("Mismatched close tag" + t);
-            }            
-            if (!t.equals(name)) {
-                throw x.syntaxError("Mismatched " + name + " and " + t);
-            }
-            if (x.nextToken() != GT) {
-                throw x.syntaxError("Misshaped close tag");
-            }
-            return true;
-
-        } else if (t instanceof Character) {
-            throw x.syntaxError("Misshaped tag");
-
-// Open tag <
-
-        } else {
-            n = (String)t;
-            t = null;
-            o = new JSONObject();
-            for (;;) {
-                if (t == null) {
-                    t = x.nextToken();
-                }
-
-// attribute = value
-
-                if (t instanceof String) {
-                    s = (String)t;
-                    t = x.nextToken();
-                    if (t == EQ) {
-                        t = x.nextToken();
-                        if (!(t instanceof String)) {
-                            throw x.syntaxError("Missing value");
-                        }
-                        o.accumulate(s, JSONObject.stringToValue((String)t));
-                        t = null;
-                    } else {
-                        o.accumulate(s, "");
-                    }
-
-// Empty tag <.../>
-
-                } else if (t == SLASH) {
-                    if (x.nextToken() != GT) {
-                        throw x.syntaxError("Misshaped tag");
-                    }
-                    if (o.length() > 0) {
-                        context.accumulate(n, o);
-                    } else {
-                    	context.accumulate(n, "");
-                    }
-                    return false;
-
-// Content, between <...> and </...>
-
-                } else if (t == GT) {
-                    for (;;) {
-                        t = x.nextContent();
-                        if (t == null) {
-                            if (n != null) {
-                                throw x.syntaxError("Unclosed tag " + n);
-                            }
-                            return false;
-                        } else if (t instanceof String) {
-                            s = (String)t;
-                            if (s.length() > 0) {
-                                o.accumulate("content", JSONObject.stringToValue(s));
-                            }
-
-// Nested element
-
-                        } else if (t == LT) {
-                            if (parse(x, o, n)) {
-                                if (o.length() == 0) {
-                                    context.accumulate(n, "");
-                                } else if (o.length() == 1 &&
-                                       o.opt("content") != null) {
-                                    context.accumulate(n, o.opt("content"));
-                                } else {
-                                    context.accumulate(n, o);
-                                }
-                                return false;
-                            }
-                        }
-                    }
-                } else {
-                    throw x.syntaxError("Misshaped tag");
-                }
-            }
-        }
+        ifNedestMethod(t, c, x, s, i, name, n, o);
+        
+        
+        
+        
     }
 
 
@@ -319,7 +469,185 @@ public class XML {
         return toString(o, null);
     }
 
+    //_______________________________________________________________________
+    
+public static String ifStringMethod(Object o, String tagName, StringBuffer b, Object v, JSONObject jo, Iterator keys, String k, String s, int len, JSONArray ja, int i) {
+	
+	   if (o instanceof JSONObject) {
 
+		// Emit <tagName>
+		   
+		   ifTagNameMethod(tagName, b);
+
+		// Loop thru the keys.
+
+		            jo = (JSONObject)o;
+		            keys = jo.keys();
+		            
+		            whileKeysMethod(v, s, keys, jo, k, len, b, ja, i );
+		            
+		            tagNameIfMethod(tagName, b);
+		            
+		            return b.toString();
+
+		// XML does not have good support for arrays. If an array appears in a place
+		// where XML is lacking, synthesize an <array> element.
+
+		        } else if (o instanceof JSONArray) {
+		            ja = (JSONArray)o;
+		            len = ja.length();
+		            
+		            forTagNameMethod(i, tagName, b, v, ja, len);
+		            
+		            return b.toString();
+		        } else {
+		        	
+		        	elseMethod(s,o, tagName);
+		        	
+		        }
+		    }
+
+    
+    public static String elseMethod(String s, Object o, String tagName) {
+
+        s = (o == null) ? "null" : escape(o.toString());
+        return (tagName == null) ? "\"" + s + "\"" :
+            (s.length() == 0) ? "<" + tagName + "/>" :
+            "<" + tagName + ">" + s + "</" + tagName + ">";
+    }
+    
+    public static String forTagNameMethod(int i, String tagName, StringBuffer b, Object v, JSONArray ja, int len)
+    {
+    	for (i = 0; i < len; ++i) {
+        	v = ja.opt(i);
+            b.append(toString(v, (tagName == null) ? "array" : tagName));
+        }	
+    }
+    public static String tagNameIfMethod(String tagName, StringBuffer b ) {
+    	 if (tagName != null) {
+
+    			// Emit the </tagname> close tag
+
+    			                b.append("</");
+    			                b.append(tagName);
+    			                b.append('>');
+        }
+    }
+    
+   public static String ifTagNameMethod(String tagName, StringBuffer b ) {
+	   if (tagName != null) {
+           b.append('<');
+           b.append(tagName);
+           b.append('>');
+       }   
+   }
+   
+   public static String whileKeysMethod(Object v, String s, Iterator keys, JSONObject jo, String k, int len,StringBuffer b, JSONArray ja, int i ) {
+	   while (keys.hasNext()) {
+           k = keys.next().toString();
+           v = jo.opt(k);
+           
+           ifKeyMethod(v);
+           
+           ifKey2Method(v, s);
+           
+// Emit content in body
+
+           ifkMethod(i, b, ja, v, k, len);
+	   }   
+   }
+   
+   public static String ifKeyMethod(Object v) {
+	   if (v == null) {
+          	v = "";
+          }
+   }
+   
+   public static String ifKey2Method(Object v, String s) {
+	   if (v instanceof String) {
+           s = (String)v;
+       } else {
+           s = null;
+       }
+   }
+   
+   public static String ifKMethod(int i, StringBuffer b, JSONArray ja, Object v, String k, int len) {
+	   if (k.equals("content")) {
+		   
+		   ifVMethod(i, b, ja, v, len);
+		   
+
+//Emit an array of similar keys
+
+       } else if (v instanceof JSONArray) {
+           ja = (JSONArray)v;
+           len = ja.length();
+           
+         forI2Method(i, v, b, k, len, ja);
+           
+       } else if (v.equals("")) {
+           b.append('<');
+           b.append(k);
+           b.append("/>");
+
+//Emit a new tag <k>
+
+       } else {
+           b.append(toString(v, k));
+       }
+   }
+   
+   
+   public static String ifVMethod(int i, StringBuffer b, JSONArray ja, Object v, int len) {
+	   if (v instanceof JSONArray) {
+           ja = (JSONArray)v;
+           len = ja.length();
+           
+           forIMethod(i, b, ja, len);
+           
+          
+       } else {
+           b.append(escape(v.toString()));
+       }   
+   }
+   
+   public static String forIMethod(int i, StringBuffer b, JSONArray ja, int len) {
+	   for (i = 0; i < len; i += 1) {
+		   
+		   ifForMethod(i, b);
+           
+           b.append(escape(ja.get(i).toString()));
+       }
+   }
+   
+   public static String ifForMethod(int i, StringBuffer b) {
+	   if (i > 0) {
+           b.append('\n');
+       }
+   }
+   
+   public static String forI2Method(int i, Object v, StringBuffer b, String k, int len, JSONArray ja) {
+	   for (i = 0; i < len; i += 1) {
+          	v = ja.get(i);
+          	
+          	ifVForMethod(v, b, k);    
+   }
+  }
+   
+   public static String ifVForMethod(Object v, StringBuffer b, String k) {
+	   if (v instanceof JSONArray) {
+           b.append('<');
+           b.append(k);
+           b.append('>');
+   		b.append(toString(v));
+           b.append("</");
+           b.append(k);
+           b.append('>');
+   	} else {
+   		b.append(toString(v, k));
+   	}
+   }
+    //_________________________________________________________________________
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
      * @param o A JSONObject.
@@ -338,104 +666,7 @@ public class XML {
         int          len;
         String       s;
         Object       v;
-        if (o instanceof JSONObject) {
-
-// Emit <tagName>
-
-            if (tagName != null) {
-                b.append('<');
-                b.append(tagName);
-                b.append('>');
-            }
-
-// Loop thru the keys.
-
-            jo = (JSONObject)o;
-            keys = jo.keys();
-            while (keys.hasNext()) {
-                k = keys.next().toString();
-                v = jo.opt(k);
-                if (v == null) {
-                	v = "";
-                }
-                if (v instanceof String) {
-                    s = (String)v;
-                } else {
-                    s = null;
-                }
-
-// Emit content in body
-
-                if (k.equals("content")) {
-                    if (v instanceof JSONArray) {
-                        ja = (JSONArray)v;
-                        len = ja.length();
-                        for (i = 0; i < len; i += 1) {
-                            if (i > 0) {
-                                b.append('\n');
-                            }
-                            b.append(escape(ja.get(i).toString()));
-                        }
-                    } else {
-                        b.append(escape(v.toString()));
-                    }
-
-// Emit an array of similar keys
-
-                } else if (v instanceof JSONArray) {
-                    ja = (JSONArray)v;
-                    len = ja.length();
-                    for (i = 0; i < len; i += 1) {
-                    	v = ja.get(i);
-                    	if (v instanceof JSONArray) {
-                            b.append('<');
-                            b.append(k);
-                            b.append('>');
-                    		b.append(toString(v));
-                            b.append("</");
-                            b.append(k);
-                            b.append('>');
-                    	} else {
-                    		b.append(toString(v, k));
-                    	}
-                    }
-                } else if (v.equals("")) {
-                    b.append('<');
-                    b.append(k);
-                    b.append("/>");
-
-// Emit a new tag <k>
-
-                } else {
-                    b.append(toString(v, k));
-                }
-            }
-            if (tagName != null) {
-
-// Emit the </tagname> close tag
-
-                b.append("</");
-                b.append(tagName);
-                b.append('>');
-            }
-            return b.toString();
-
-// XML does not have good support for arrays. If an array appears in a place
-// where XML is lacking, synthesize an <array> element.
-
-        } else if (o instanceof JSONArray) {
-            ja = (JSONArray)o;
-            len = ja.length();
-            for (i = 0; i < len; ++i) {
-            	v = ja.opt(i);
-                b.append(toString(v, (tagName == null) ? "array" : tagName));
-            }
-            return b.toString();
-        } else {
-            s = (o == null) ? "null" : escape(o.toString());
-            return (tagName == null) ? "\"" + s + "\"" :
-                (s.length() == 0) ? "<" + tagName + "/>" :
-                "<" + tagName + ">" + s + "</" + tagName + ">";
-        }
+        
+        ifStringMethod( o, tagName, b, v, jo, keys, k, s, len, ja);
     }
 }

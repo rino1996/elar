@@ -1,3 +1,4 @@
+//martino gay
 package org.json;
 
 /*
@@ -101,48 +102,64 @@ public class JSONArray {
      * @param x A JSONTokener
      * @throws JSONException If there is a syntax error.
      */
-    public JSONArray(JSONTokener x) throws JSONException {
+    public static void switchMethod(char c, char q, JSONTokener x) {//mio
+    	switch (c) {
+        case ';':
+        case ',':
+            if (x.nextClean() == ']') {
+                return;
+            }
+            x.back();
+            break;
+        case ']':
+        case ')':
+            if (q != c) {
+                throw x.syntaxError("Expected a '" + new Character(q) + "'");
+            }
+            return;
+        default:
+            throw x.syntaxError("Expected a ',' or ']'");
+        }
+    }
+    public static void forMethod(char c, char q, JSONTokener x) {//mio
+    	 for (;;) {
+             if (x.nextClean() == ',') {
+                 x.back();
+                 this.myArrayList.add(null);
+             } else {
+                 x.back();
+                 this.myArrayList.add(x.nextValue());
+             }
+             c = x.nextClean();
+             switchMethod(c,q, x);
+             
+         }
+    }
+    public static void switch2Method(char c, char q, JSONTokener x) {//mio
+    	 switch(c) {
+         case '[':
+         	 q = ']';
+         	 break;
+         case '(':
+         	q = ')';
+         	break;
+         default: throw x.syntaxError("A JSONArray text must start with '['");
+         }
+    }
+    public JSONArray(JSONTokener x) throws JSONException {//sistemato da me
         this();
         char c = x.nextClean();
         char q;
-        if (c == '[') {
-            q = ']';
-        } else if (c == '(') {
-            q = ')';
-        } else {
-            throw x.syntaxError("A JSONArray text must start with '['");
-        }
+        switch2Method(c,q,x);
+       
+        
         if (x.nextClean() == ']') {
             return;
         }
         x.back();
-        for (;;) {
-            if (x.nextClean() == ',') {
-                x.back();
-                this.myArrayList.add(null);
-            } else {
-                x.back();
-                this.myArrayList.add(x.nextValue());
-            }
-            c = x.nextClean();
-            switch (c) {
-            case ';':
-            case ',':
-                if (x.nextClean() == ']') {
-                    return;
-                }
-                x.back();
-                break;
-            case ']':
-            case ')':
-                if (q != c) {
-                    throw x.syntaxError("Expected a '" + new Character(q) + "'");
-                }
-                return;
-            default:
-                throw x.syntaxError("Expected a ',' or ']'");
-            }
-        }
+        
+        forMethod(c,q,x);
+       
     }
 
 

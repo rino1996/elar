@@ -237,54 +237,51 @@ public class JSONTokener {
      * @return      A String.
      * @throws JSONException Unterminated string.
      */
+    public static void switch1Method(char c,StringBuffer sb ) {//mio
+    	switch (c) {
+        case 'b':
+            sb.append('\b');
+            break;
+        case 't':
+            sb.append('\t');
+            break;
+        case 'n':
+            sb.append('\n');
+            break;
+        default:
+            throw syntaxError("Illegal escape.");
+        }
+    }
+    public static String switchMethod(char c,StringBuffer sb ) {//mio
+    	   switch (c) {
+           case 0:
+           case '\n':
+           case '\r':
+               throw syntaxError("Unterminated string");
+           case '\\':
+               c = next();
+               switch1Method(c,sb);
+               
+               break;
+           default:
+               if (c == quote) {
+                   return sb.toString();
+               }
+               sb.append(c);
+           }
+    }
+    public static void forMethod(char c, StringBuffer sb) {//mio
+    	for (;;) {
+            c = next();
+            switchMethod(c, sb);
+         
+        }
+    }
     public String nextString(char quote) throws JSONException {
         char c;
         StringBuffer sb = new StringBuffer();
-        for (;;) {
-            c = next();
-            switch (c) {
-            case 0:
-            case '\n':
-            case '\r':
-                throw syntaxError("Unterminated string");
-            case '\\':
-                c = next();
-                switch (c) {
-                case 'b':
-                    sb.append('\b');
-                    break;
-                case 't':
-                    sb.append('\t');
-                    break;
-                case 'n':
-                    sb.append('\n');
-                    break;
-                case 'f':
-                    sb.append('\f');
-                    break;
-                case 'r':
-                    sb.append('\r');
-                    break;
-                case 'u':
-                    sb.append((char)Integer.parseInt(next(4), 16));
-                    break;
-                case '"':
-                case '\'':
-                case '\\':
-                case '/':
-                	sb.append(c);
-                	break;
-                default:
-                    throw syntaxError("Illegal escape.");
-                }
-                break;
-            default:
-                if (c == quote) {
-                    return sb.toString();
-                }
-                sb.append(c);
-            }
-        }
+        forMethod(c, sb);
+        
     }
 
 
@@ -339,22 +336,25 @@ public class JSONTokener {
      *
      * @return An object.
      */
-    public Object nextValue() throws JSONException {
+    public static String switch2Method(char c) {//mio
+    	switch (c) {
+        case '"':
+        case '\'':
+            return nextString(c);
+        case '{':
+            back();
+            return new JSONObject(this);
+        case '[':
+        case '(':
+            back();
+            return new JSONArray(this);
+    }
+    }
+       public Object nextValue() throws JSONException {
         char c = nextClean();
         String s;
-
-        switch (c) {
-            case '"':
-            case '\'':
-                return nextString(c);
-            case '{':
-                back();
-                return new JSONObject(this);
-            case '[':
-            case '(':
-                back();
-                return new JSONArray(this);
-        }
+        switch2Method(c);
+        
 
         /*
          * Handle unquoted text. This could be the values true, false, or

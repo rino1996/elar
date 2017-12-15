@@ -1,5 +1,10 @@
 package org.json;
 
+import prova.JSONArray;
+import prova.JSONException;
+import prova.JSONObject;
+import prova.JSONTokener;
+
 /*
 Copyright (c) 2002 JSON.org
 
@@ -52,6 +57,36 @@ public class CDL {
      * @return The value string, or null if empty.
      * @throws JSONException if the quoted string is badly formed.
      */
+	public static void for1(char c, char q, StringBuffer sb,JSONTokener x ) {//mio
+		for (;;) {
+    		c = x.next();
+    		if (c == q) {
+    			break;
+    		}
+            if (c == 0 || c == '\n' || c == '\r') {
+                throw x.syntaxError("Missing close quote '" + q + "'.");
+            }
+            sb.append(c);
+    	}
+	}
+	public static String switchMethodString(char q, char c,StringBuffer sb,JSONTokener x) {//mio
+		 switch (c) {
+	        case 0:
+	            return null;
+	        case '"':
+	        case '\'':
+	        	q = c;
+	        	sb = new StringBuffer();
+	        	for1(c, q, sb, x );
+	            return sb.toString();
+	        case ',':
+	            x.back();
+	            return "";
+	        default:
+	            x.back();
+	            return x.nextTo(',');
+	        }
+	}
     private static String getValue(JSONTokener x) throws JSONException {
         char c;
         char q;
@@ -59,31 +94,8 @@ public class CDL {
         do {
             c = x.next();
         } while (c == ' ' || c == '\t');
-        switch (c) {
-        case 0:
-            return null;
-        case '"':
-        case '\'':
-        	q = c;
-        	sb = new StringBuffer();
-        	for (;;) {
-        		c = x.next();
-        		if (c == q) {
-        			break;
-        		}
-                if (c == 0 || c == '\n' || c == '\r') {
-                    throw x.syntaxError("Missing close quote '" + q + "'.");
-                }
-                sb.append(c);
-        	}
-            return sb.toString();
-        case ',':
-            x.back();
-            return "";
-        default:
-            x.back();
-            return x.nextTo(',');
-        }
+        
+        switchMethodString(q, c, sb,x);
     }
 
     /**
@@ -92,30 +104,43 @@ public class CDL {
      * @return A JSONArray of strings.
      * @throws JSONException
      */
-    public static JSONArray rowToJSONArray(JSONTokener x) throws JSONException {
-        JSONArray ja = new JSONArray();
-        for (;;) {
-            String value = getValue(x);
+    public static JSONArray ifMethod(char c,JSONArray ja) {//mio
+    	if (c == '\n' || c == '\r' || c == 0) {
+            return ja;
+    }
+    }
+    public static void for3Method(char c,JSONArray ja,JSONTokener x) {//mio
+    	for (;;) {                
+            if (c == ',') {
+                break;
+            }
+            if (c != ' ') {
+            	ifMethod(c, ja);
+                
+                }
+                throw x.syntaxError("Bad character '" + c + "' (" +
+                        (int)c + ").");
+            }
+            c = x.next();
+        }
+    
+    public static  Object for2Method( JSONArray ja, JSONTokener x) {//mio
+    	for (;;) {
+			String value = getValue(x);
             char c = x.next();
             if (value == null || 
             		(ja.length() == 0 && value.length() == 0 && c != ',')) {
                 return null;
             }
             ja.put(value);
-            for (;;) {                
-                if (c == ',') {
-                    break;
-                }
-                if (c != ' ') {
-                    if (c == '\n' || c == '\r' || c == 0) {
-                        return ja;
-                    }
-                    throw x.syntaxError("Bad character '" + c + "' (" +
-                            (int)c + ").");
-                }
-                c = x.next();
-            }
+            for3Method(c, ja, x);
+            
         }
+    }
+    public static JSONArray rowToJSONArray(JSONTokener x) throws JSONException {
+        JSONArray ja = new JSONArray();
+        for2Method(ja, x);
+        
     }
 
     /**
@@ -204,32 +229,45 @@ public class CDL {
      * @param ja A JSONArray of strings.
      * @return A string ending in NEWLINE.
      */
-    public static String rowToString(JSONArray ja) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < ja.length(); i += 1) {
+    public static void if2Method(String s, StringBuffer sb ) {//mio
+    	  if (s.length() > 0 && (s.indexOf(',') >= 0 || s.indexOf('\n') >= 0 || 
+          		s.indexOf('\r') >= 0 || s.indexOf(0) >= 0 || 
+          		s.charAt(0) == '"')) {
+              sb.append('"');
+          	int length = s.length();
+          	for (int j = 0; j < length; j += 1) {
+          		char c = s.charAt(j);
+          		if (c >= ' ' && c != '"') {
+          			sb.append(c);
+          		}
+              }
+              sb.append('"');
+          } 
+    }
+    public static void if1Method(Object o,StringBuffer sb) {
+    	String s = o.toString();
+    	if (o != null) {
+        
+        if2Method(s, sb);}
+      else {
+            sb.append(s);
+        }
+    }
+    
+    public static void for4Method(StringBuffer sb,JSONArray ja ) {//mio
+    	for (int i = 0; i < ja.length(); i += 1) {
             if (i > 0) {
                 sb.append(',');
             }
             Object o = ja.opt(i);
-            if (o != null) {
-                String s = o.toString();
-                if (s.length() > 0 && (s.indexOf(',') >= 0 || s.indexOf('\n') >= 0 || 
-                		s.indexOf('\r') >= 0 || s.indexOf(0) >= 0 || 
-                		s.charAt(0) == '"')) {
-                    sb.append('"');
-                	int length = s.length();
-                	for (int j = 0; j < length; j += 1) {
-                		char c = s.charAt(j);
-                		if (c >= ' ' && c != '"') {
-                			sb.append(c);
-                		}
-                    }
-                    sb.append('"');
-                } else {
-                    sb.append(s);
-                }
-            }
+            if1Method(o, sb);
+            
         }
+    }
+    public static String rowToString(JSONArray ja) {
+        StringBuffer sb = new StringBuffer();
+        for4Method(sb, ja);
+        
         sb.append('\n');
         return sb.toString();
     }
@@ -277,3 +315,4 @@ public class CDL {
         return sb.toString();
     }
 }
+

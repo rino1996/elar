@@ -1,5 +1,5 @@
 package org.json;
-
+//annarita pphh
 /*
 Copyright (c) 2008 JSON.org
 
@@ -44,7 +44,349 @@ public class JSONML {
      *     if we are at the outermost level.
      * @return A JSONArray if the value is the outermost tag, otherwise null.
      * @throws JSONException
+     * 
      */
+	
+	//______________________________________________________________________
+	
+	public static Object controlloToken(Object token, XMLTokener x) {
+		
+		if (!(token instanceof String)) {
+    		throw new JSONException(
+    				"Expected a closing name instead of '" + 
+    				token + "'.");
+    	}
+        if (x.nextToken() != XML.GT) {
+            throw x.syntaxError("Misshaped close tag");
+        }
+        return token;
+		
+	}
+	//______________________________________________________________
+	
+
+	
+	public static void controlloC(char c,XMLTokener x, Object token ) {
+	
+	 
+    if (c == '-') {
+        if (x.next() == '-') {
+            x.skipPast("-->");
+        }
+        x.back();
+    } else if (c == '[') {
+        token = x.nextToken();
+        
+        if (c == '-') {
+            if (x.next() == '-') {
+                x.skipPast("-->");
+            }
+            x.back();
+        } else if (c == '[') {
+            token = x.nextToken();
+}
+        
+        
+    }
+    }        
+        
+        
+	//_____________________________________________________________        
+        
+        public static void ControlloJa(XMLTokener x,boolean arrayForm, JSONArray ja ) {
+        	if (ja != null) {
+        		ja.put(x.nextCDATA());
+        	}
+         else {
+        	throw x.syntaxError("Expected 'CDATA['");
+        }
+        	
+        }
+        //____________________________________________________________
+        
+        public static Object doParseWhile(Object token,int i, XMLTokener x ){
+        	
+        	i = 1;
+            do {
+                token = x.nextMeta();
+                if (token == null) {
+                    throw x.syntaxError("Missing '>' after '<!'.");
+                } else if (token == XML.LT) {
+                    i += 1;
+                } else if (token == XML.GT) {
+                    i -= 1;
+                }
+            } while (i > 0);
+        	return token;
+        }
+        
+        
+        //____________________________________________________________
+        
+        
+        public static void openTagMethod(XMLTokener x, Object token, JSONArray  newja, String tagName, JSONObject newjo, boolean arrayForm,JSONArray ja)
+        {
+        	if (!(token instanceof String)) {
+	            throw x.syntaxError("Bad tagName '" + token + "'.");		        		
+        	}
+        	tagName = (String)token;
+            newja = new JSONArray();		
+            newjo = new JSONObject();
+        	if (arrayForm) {
+	            newja.put(tagName);
+	            if (ja != null) {
+	            	ja.put(newja);
+	            }
+	        } else {
+        		newjo.put("tagName", tagName);
+        		if (ja != null) {
+	            	ja.put(newjo);
+	            }
+	        }
+        	
+        }
+        
+        
+        
+        //____________________________________________________________
+        
+        
+        public static void openTagControlMethod(XMLTokener x,Object token) {
+        	
+        	token = null;
+            for (;;) {
+                if (token == null) {
+                    token = x.nextToken();
+                }
+                if (token == null) {
+                	throw x.syntaxError("Misshaped tag");
+                }
+                if (!(token instanceof String)) {
+                	break;
+                }
+
+        
+            }
+                
+        }
+        	//_____________________________________________________________
+            
+            public static void arrayFormMethod(XMLTokener x,Object token, String attribute,JSONObject newjo, boolean arrayForm) 
+            {
+            	
+            	attribute = (String)token;
+	        	if (!arrayForm && (attribute == "tagName" || attribute == "childNode")) {
+                    throw x.syntaxError("Reserved attribute.");			        		
+	        	}
+                token = x.nextToken();
+                if (token == XML.EQ) {
+                    token = x.nextToken();
+                    if (!(token instanceof String)) {
+                        throw x.syntaxError("Missing value");
+                    }
+                    newjo.accumulate(attribute, JSONObject.stringToValue((String)token));
+                    token = null;
+                } else {
+                	newjo.accumulate(attribute, "");
+                }
+            	
+            }
+            	//____________________________________________________________
+            
+            public static void emptyTagMethod(XMLTokener x,Object token, JSONArray  newja,JSONObject newjo, boolean arrayForm, JSONArray ja) 
+            {
+            	
+                if (token == XML.SLASH) {
+                    if (x.nextToken() != XML.GT) {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    if (ja == null) {
+                    	if (arrayForm) {
+                    		return newja;
+                    	} else {
+                    		return newjo;
+                    	}
+                    }
+
+                }
+            	
+            	
+            	
+            }
+            //_________________________________________________________________
+            
+            public static void tagChiusuraMethod(XMLTokener x, String closeTag,String tagName)
+            {
+     
+            	if (!closeTag.equals(tagName)) {
+            		throw x.syntaxError("Mismatched '" + tagName + 
+            				"' and '" + closeTag + "'");
+		        }
+            
+            }
+            //___________________________________________________
+            
+            public static String jaNullMethod(boolean arrayForm, JSONArray ja, JSONArray  newja, JSONObject newjo)
+            {
+            	
+            	if (ja == null) {
+                	if (arrayForm) {
+                		return newja;
+                	} else {
+                		return newjo;
+                	}
+            }
+            
+            	
+            	}
+            
+            //___________________________________________________
+            
+            public static int vero1 (XMLTokener x,Object token,char c) 
+            {
+            	
+            	if ((token instanceof Character) && (token == XML.SLASH)) 
+            	{
+
+            		// Close tag </
+            		 	token = controlloToken(token, x);
+  			        	token = x.nextToken();
+  			        	return 0;
+            	}else if (token == XML.BANG) {   		
+  			        	// <!
+  			          c = x.next();
+  			          controlloC(c,x);
+  			          return 1;
+  			       }   		
+              }
+
+
+            //__________________________________________________
+            public static Object controlloCdata(XMLTokener x,Object token, String attribute, char c,
+            	    String closeTag,int i, JSONArray  newja, JSONObject newjo, String tagName, 
+            	    boolean arrayForm, JSONArray ja) {
+            
+            	if (token.equals("CDATA") && x.next() == '[') {
+                	controlloJa(ja);
+         
+            } else {
+            	 
+            token = doParseWhile(x,token,attribute,c,closeTag,i,newja,newjo,tagName,arrayForm,ja);
+	            return token;
+            }
+            
+            }
+            
+            //__________________________________________________
+            
+            public static int semplificaIfMethod(XMLTokener x,Object token,String attribute,int aux,char c,
+            		String closeTag,int i, JSONArray  newja, JSONObject newjo,
+            		String tagName, boolean arrayForm, JSONArray ja) {
+            	
+            	token = x.nextToken();
+    			int vero = 1;
+    			
+    			aux = vero1( x,token, c);
+    						 if (aux == 1) {
+    						 
+    						token = controlloCdata(x,token,attribute,c,closeTag,i,newja,newjo,tagName,arrayForm,ja);
+    							 
+    						 }
+			                
+			         else {
+			      if (token == XML.QUEST) {
+			    	  x.skipPast("?>");
+			    	  return 1;
+			        } else {
+			            throw x.syntaxError("Misshaped tag");
+			            openTagMethod( token, newja, tagName, newjo);
+		        		openTagControlMethod( x,token);
+		        		return 0;
+			        }
+
+		        				        		
+		            }
+            }//
+            
+            //_________________________________________________________________
+            
+            public static void arrayFormMethod1(XMLTokener x,Object token, String attribute, char c,
+            	    String closeTag,int i, JSONArray  newja, JSONObject newjo, String tagName, 
+            	    boolean arrayForm, JSONArray ja) {
+            	
+            	if (arrayForm && newjo.length() > 0) {
+                	newja.put(newjo);
+                	emptyTagMethod( x, token, newjo, arrayForm, ja);
+                }
+		
+//Empty tag <.../>
+                	
+             // Content, between <...> and </...>	                
+                else {
+                	if (token != XML.GT) {
+                		throw x.syntaxError("Misshaped tag");
+                	}
+        
+                }
+            }
+            
+            //_________________________________________________________________
+            
+            public static void arrayFormDiversa(XMLTokener x,Object token, String attribute, char c,
+            	    String closeTag,int i, JSONArray  newja, JSONObject newjo, String tagName, 
+            	    boolean arrayForm, JSONArray ja) {
+            	if (!arrayForm && newja.length() > 0) {
+        			newjo.put("childNodes", newja);
+        		}
+            }
+            //_________________________________________________________________
+        
+            public static void ultimoIf(JSONArray ja, Object token) {
+            	if (ja != null) {
+		    		ja.put(token instanceof String ? 
+		    				JSONObject.stringToValue((String)token) : token);
+		    	}
+            }
+            
+            
+            //________________________________________________________________
+	public static void parseWhile(XMLTokener x,Object token, String attribute, char c,
+    String closeTag,int i, JSONArray  newja, JSONObject newjo, String tagName, 
+    boolean arrayForm, JSONArray ja ) {
+		
+		int aux = 0;
+		int eseguito = 0;
+        while (true) {
+        	token = x.nextContent();
+        	
+    		if (token == XML.LT) {
+    	eseguito =semplificaIfMethod(x,token,attribute, aux, c, closeTag, i, newja, newjo,tagName, arrayForm, ja);
+    			  
+    				if (eseguito == 1)
+    				{
+    					arrayFormMethod1(x,token,attribute, c, closeTag, i, newja, newjo,tagName, arrayForm, ja);
+    				}
+                        	closeTag = (String)parse(x, arrayForm, newja);
+	                	
+	                	if (closeTag != null) {
+	                	tagChiusuraMethod( x, closeTag,tagName);
+		                // continuare da qua e fare i metodi	
+		                	tagName = null;
+		                	arrayFormDiversa(x,token,attribute, c, closeTag, i, newja, newjo,tagName, arrayForm, ja);
+		            		
+		            		 jaNullMethod( arrayForm, ja, newja, newjo);
+		                			                	
+	                	}                	
+	                	
+	            
+    			else 
+    				ultimoIf(ja,token);
+        
+	}
+        }
+	}
+	//_______________________________
+	
     private static Object parse(XMLTokener x, boolean arrayForm, 
     		JSONArray ja) throws JSONException {
         String     attribute;
@@ -61,168 +403,8 @@ public class JSONML {
 //      <![  ... ]]>
 //      <!   ...   >
 //      <?   ...  ?>
-        
-        while (true) {
-        	token = x.nextContent();
-    		if (token == XML.LT) {
-    			token = x.nextToken();
-    			if (token instanceof Character) {
-			        if (token == XML.SLASH) {
+        parseWhile( x, token, attribute, c, closeTag, i, newja, newjo, tagName, arrayForm,ja );
 
-// Close tag </
-
-			        	token = x.nextToken();
-			        	if (!(token instanceof String)) {
-			        		throw new JSONException(
-			        				"Expected a closing name instead of '" + 
-			        				token + "'.");
-			        	}
-			            if (x.nextToken() != XML.GT) {
-			                throw x.syntaxError("Misshaped close tag");
-			            }
-			            return token;
-			        } else if (token == XML.BANG) {
-        		
-// <!
-        	
-			            c = x.next();
-			            if (c == '-') {
-			                if (x.next() == '-') {
-			                    x.skipPast("-->");
-			                }
-			                x.back();
-			            } else if (c == '[') {
-			                token = x.nextToken();
-			                if (token.equals("CDATA") && x.next() == '[') {
-			                	if (ja != null) {
-			                		ja.put(x.nextCDATA());
-			                	}
-			                } else {
-			                	throw x.syntaxError("Expected 'CDATA['");
-			                }
-			            } else {
-				            i = 1;
-				            do {
-				                token = x.nextMeta();
-				                if (token == null) {
-				                    throw x.syntaxError("Missing '>' after '<!'.");
-				                } else if (token == XML.LT) {
-				                    i += 1;
-				                } else if (token == XML.GT) {
-				                    i -= 1;
-				                }
-				            } while (i > 0);
-			            }
-			        } else if (token == XML.QUEST) {
-
-// <?
-
-			        	x.skipPast("?>");
-			        } else {
-			            throw x.syntaxError("Misshaped tag");
-			        }
-
-// Open tag <
-
-		        } else {
-		        	if (!(token instanceof String)) {
-			            throw x.syntaxError("Bad tagName '" + token + "'.");		        		
-		        	}
-		        	tagName = (String)token;
-		            newja = new JSONArray();		
-		            newjo = new JSONObject();
-		        	if (arrayForm) {
-			            newja.put(tagName);
-			            if (ja != null) {
-			            	ja.put(newja);
-			            }
-			        } else {
-		        		newjo.put("tagName", tagName);
-		        		if (ja != null) {
-			            	ja.put(newjo);
-			            }
-			        }
-		            token = null;
-		            for (;;) {
-		                if (token == null) {
-		                    token = x.nextToken();
-		                }
-		                if (token == null) {
-		                	throw x.syntaxError("Misshaped tag");
-		                }
-		                if (!(token instanceof String)) {
-		                	break;
-		                }
-
-//		              attribute = value
-
-	                    attribute = (String)token;
-			        	if (!arrayForm && (attribute == "tagName" || attribute == "childNode")) {
-                            throw x.syntaxError("Reserved attribute.");			        		
-			        	}
-	                    token = x.nextToken();
-	                    if (token == XML.EQ) {
-	                        token = x.nextToken();
-	                        if (!(token instanceof String)) {
-	                            throw x.syntaxError("Missing value");
-	                        }
-	                        newjo.accumulate(attribute, JSONObject.stringToValue((String)token));
-	                        token = null;
-	                    } else {
-	                    	newjo.accumulate(attribute, "");
-	                    }
-		            }
-                    if (arrayForm && newjo.length() > 0) {
-                    	newja.put(newjo);
-                    }
-
-// Empty tag <.../>
-
-	                if (token == XML.SLASH) {
-	                    if (x.nextToken() != XML.GT) {
-	                        throw x.syntaxError("Misshaped tag");
-	                    }
-	                    if (ja == null) {
-	                    	if (arrayForm) {
-	                    		return newja;
-	                    	} else {
-	                    		return newjo;
-	                    	}
-	                    }
-
-// Content, between <...> and </...>
-
-	                } else {
-	                	if (token != XML.GT) {
-	                		throw x.syntaxError("Misshaped tag");
-	                	}
-	                	closeTag = (String)parse(x, arrayForm, newja);
-	                	if (closeTag != null) {
-		                	if (!closeTag.equals(tagName)) {
-		                		throw x.syntaxError("Mismatched '" + tagName + 
-		                				"' and '" + closeTag + "'");
-					        }
-		                	tagName = null;
-		            		if (!arrayForm && newja.length() > 0) {
-		            			newjo.put("childNodes", newja);
-		            		}
-		                	if (ja == null) {
-		                    	if (arrayForm) {
-		                    		return newja;
-		                    	} else {
-		                    		return newjo;
-		                    	}
-		                	}
-	                	}
-                	}
-	            }
-		    } else {
-		    	if (ja != null) {
-		    		ja.put(token instanceof String ? 
-		    				JSONObject.stringToValue((String)token) : token);
-		    	}
-		    }
-        }
     }
 
 
@@ -301,6 +483,49 @@ public class JSONML {
      * @return An XML string.
      * @throws JSONException
      */
+    //_______________________________________________________
+    
+    public static StringBuffer emitAttributesMethod(StringBuffer sb,String v, String k,
+    		JSONObject jo, Iterator keys) {
+    	
+    	while (keys.hasNext()) {
+            k = keys.next().toString();
+        	XML.noSpace(k);
+            v = jo.optString(k);
+            if (v != null) {
+	            sb.append(' ');
+	            sb.append(XML.escape(k));
+	            sb.append('=');
+	            sb.append('"');
+	            sb.append(XML.escape(v));
+	            sb.append('"');
+            }
+        }
+    	return sb;
+    }
+    //______________________________________________________
+    
+    public static StringBuffer emitContentBodyMethod(StringBuffer sb,JSONArray ja, int i,
+    		int length,Object e) {
+    	
+    	do {
+		    e = ja.get(i);
+		    i += 1;
+		    if (e != null) {
+		    	if (e instanceof String) {
+		    		sb.append(XML.escape(e.toString()));
+				} else if (e instanceof JSONObject) {
+					sb.append(toString((JSONObject)e));
+				} else if (e instanceof JSONArray) {
+					sb.append(toString((JSONArray)e));
+				}
+		    }
+		} while (i < length);
+    	return sb;
+    }
+    
+    //______________________________________________________
+    
     public static String toString(JSONArray ja) throws JSONException {
     	Object		 e;
     	int			 i;
@@ -328,22 +553,11 @@ public class JSONML {
 // Emit the attributes
 			
 	        keys = jo.keys();
-	        while (keys.hasNext()) {
-	            k = keys.next().toString();
-            	XML.noSpace(k);
-	            v = jo.optString(k);
-	            if (v != null) {
-		            sb.append(' ');
-		            sb.append(XML.escape(k));
-		            sb.append('=');
-		            sb.append('"');
-		            sb.append(XML.escape(v));
-		            sb.append('"');
-	            }
-	        }  
-		} else {
+	        sb = emitAttributesMethod( sb, v, k,jo, keys);
+	          
+		} else 
 			i = 1;
-		}
+		
 	     	
 //Emit content in body
 	    	
@@ -352,20 +566,9 @@ public class JSONML {
 	        sb.append('/');
 	        sb.append('>');
 		} else {
+			
 	        sb.append('>');
-			do {
-			    e = ja.get(i);
-			    i += 1;
-			    if (e != null) {
-			    	if (e instanceof String) {
-			    		sb.append(XML.escape(e.toString()));
-					} else if (e instanceof JSONObject) {
-						sb.append(toString((JSONObject)e));
-					} else if (e instanceof JSONArray) {
-						sb.append(toString((JSONArray)e));
-					}
-			    }
-			} while (i < length);
+			emitContentBodyMethod(sb, ja, i, length, e);
 			sb.append('<');
 	        sb.append('/');
 			sb.append(tagName);
@@ -383,6 +586,25 @@ public class JSONML {
      * @return An XML string.
      * @throws JSONException
      */
+    //_____________________________________________________________
+    
+    public static StringBuffer emitContentFor(int i, int len, Object e, StringBuffer sb,
+    		JSONArray ja) {
+    	for (i = 0; i < len; i += 1) {
+		    e = ja.get(i);
+		    if (e != null) {
+		    	if (e instanceof String) {
+		    		sb.append(XML.escape(e.toString()));
+				} else if (e instanceof JSONObject) {
+					sb.append(toString((JSONObject)e));
+				} else if (e instanceof JSONArray) {
+					sb.append(toString((JSONArray)e));
+				}
+		    }
+		}
+    	return sb;
+    }
+    //____________________________________________________________
 	public static String toString(JSONObject jo) throws JSONException {
 	    StringBuffer sb = new StringBuffer();
 	    Object		 e;
@@ -408,21 +630,7 @@ public class JSONML {
 //Emit the attributes
 	
         keys = jo.keys();
-        while (keys.hasNext()) {
-            k = keys.next().toString();
-            if (!k.equals("tagName") && !k.equals("childNodes")) {
-            	XML.noSpace(k);
-	            v = jo.optString(k);
-	            if (v != null) {
-		            sb.append(' ');
-		            sb.append(XML.escape(k));
-		            sb.append('=');
-		            sb.append('"');
-		            sb.append(XML.escape(v));
-		            sb.append('"');
-	            }
-            }
-        }    
+        sb = emitAttributesMethod(sb,v, k,jo, keys);   
 		     	
 //Emit content in body
 	
@@ -433,18 +641,8 @@ public class JSONML {
 		} else {
 	        sb.append('>');
 			len = ja.length();
-			for (i = 0; i < len; i += 1) {
-			    e = ja.get(i);
-			    if (e != null) {
-			    	if (e instanceof String) {
-			    		sb.append(XML.escape(e.toString()));
-					} else if (e instanceof JSONObject) {
-						sb.append(toString((JSONObject)e));
-					} else if (e instanceof JSONArray) {
-						sb.append(toString((JSONArray)e));
-					}
-			    }
-			}
+			sb = emitContentFor(i,len, e, sb,  ja);
+			
 			sb.append('<');
 	        sb.append('/');
 			sb.append(tagName);

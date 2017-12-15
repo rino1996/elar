@@ -139,45 +139,91 @@ final class Client implements Runnable {
 		socket = null;
 	}
 
+	//____________________________________________________________________
+	
+	public void whileMethod(Thread thread, InputStream input, byte buffer[], int bufferLast, Method clientEventMethod, PApplet parent, String host) {
+		while (Thread.currentThread() == thread) {
+			
+			tryWhileMethod(input, buffer, bufferLast, thread, clientEventMethod, parent, host);
+			
+		}
+	}
+	
+	
+	public void tryWhileMethod(InputStream input, byte buffer[], int bufferLast, Thread thread, Method clientEventMethod, PApplet parent, String host ) {
+		try {
+				whileTryMethod(input, buffer, bufferLast);
+			
+			ifMethod(clientEventMethod, parent, host);
+			
+			tryTryWhileMethod(thread);
+
+		} catch (IOException e) {
+			errorMessage("run", e);
+		}
+	}
+	
+	public void whileTryMethod(InputStream input, byte buffer[], int bufferLast) {
+		while ((input != null) &&
+				(input.available() > 0)) {  // this will block
+			
+		synchronizedMethod(buffer, bufferLast);
+			
+		}
+		}
+
+
+	public void synchronizedMethod (byte buffer[], int bufferLast) {
+		
+		ifWhileMethod(buffer, bufferLast);
+		
+		buffer[bufferLast++] = (byte) input.read();
+	}
+	
+	public void ifWhileMethod(byte buffer[], int bufferLast) {
+		if (bufferLast == buffer.length) {
+			byte temp[] = new byte[bufferLast << 1];
+			System.arraycopy(buffer, 0, temp, 0, bufferLast);
+			buffer = temp;
+		}
+	}
+	
+	public void ifMethod(Method clientEventMethod, PApplet parent, String host) {
+		// now post an event
+			if (clientEventMethod != null) {
+				ifTryMethod(clientEventMethod, parent, host);
+						
+		}
+	}
+	
+	public void ifTryMethod(Method clientEventMethod, PApplet parent, String host) {
+		try {
+			clientEventMethod.invoke(parent, new Object[] { this });
+		} catch (Exception e) {
+			System.err.println("error, disabling clientEvent() for " + host);
+			e.printStackTrace();
+			clientEventMethod = null;
+		}
+	}
+	
+	public void tryTryWhileMethod(Thread thread ) {
+		try {
+			// uhh.. not sure what's best here.. since blocking,
+			// do we need to worry about sleeping much? or is this
+			// gonna try to slurp cpu away from the main applet?
+			Thread.sleep(10);
+		} catch (InterruptedException ex) { 
+		}
+	}
+	
+	//____________________________________________________________________
+	
 
 	public void run() {
 		try{
-		while (Thread.currentThread() == thread) {
-			try {
-				while ((input != null) &&
-						(input.available() > 0)) {  // this will block
-					synchronized (buffer) {
-						if (bufferLast == buffer.length) {
-							byte temp[] = new byte[bufferLast << 1];
-							System.arraycopy(buffer, 0, temp, 0, bufferLast);
-							buffer = temp;
-						}
-						buffer[bufferLast++] = (byte) input.read();
-					}
-				}
-				// now post an event
-				if (clientEventMethod != null) {
-					try {
-						clientEventMethod.invoke(parent, new Object[] { this });
-					} catch (Exception e) {
-						System.err.println("error, disabling clientEvent() for " + host);
-						e.printStackTrace();
-						clientEventMethod = null;
-					}
-				}
-
-				try {
-					// uhh.. not sure what's best here.. since blocking,
-					// do we need to worry about sleeping much? or is this
-					// gonna try to slurp cpu away from the main applet?
-					Thread.sleep(10);
-				} catch (InterruptedException ex) { 
-				}
-
-			} catch (IOException e) {
-				errorMessage("run", e);
-			}
-		}
+			
+			whileMethod(thread, input, buffer, bufferLast, clientEventMethod, parent, host);
+			
 		}
 		catch (Exception e){
 			System.out.println("Thread update problem, maybe too many thread requests: "+e);

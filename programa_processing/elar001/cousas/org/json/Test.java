@@ -15,21 +15,8 @@ public class Test {
      * Entry point.
      * @param args
      */
-    public static void main(String args[]) {
-        Iterator it;
-        JSONArray a;
-        JSONObject j;
-        JSONStringer jj;
-        Object o;
-        String s;
-        
-/** 
- *  Obj is a typical class that implements JSONString. It also
- *  provides some beanie methods that can be used to 
- *  construct a JSONObject. It also demonstrates constructing
- *  a JSONObject with an array of names.
- */
-        class Obj implements JSONString {
+	public static String objMethod() {//mio
+		class Obj implements JSONString {
         	public String aString;
         	public double aNumber;
         	public boolean aBoolean;
@@ -68,12 +55,161 @@ public class Test {
             	return this.getString() + " " + this.getNumber() + " " + 
             			this.isBoolean() + "." + this.getBENT() + " " + this.getX();
             }
-        }      
+        } 
+	}
+	public static void try1Method(JSONArray a) {//mio
+		try {
+            a = new JSONArray("[\n\r\n\r}");
+            System.out.println(a.toString());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         
+        System.out.print("Exception: ");
+        try {
+            a = new JSONArray("<\n\r\n\r      ");
+            System.out.println(a.toString());
+        } catch (Exception e) {
+            System.out.println(e);
+        } 
+        
+        System.out.print("Exception: ");
+        try {
+            a = new JSONArray();
+            a.put(Double.NEGATIVE_INFINITY);
+            a.put(Double.NaN);
+            System.out.println(a.toString());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+	}
+	public static void try2Method(JSONObject j) {//mio
+		 System.out.print("Exception: ");
+         try {
+             System.out.println(j.getDouble("stooge"));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+         System.out.print("Exception: ");
+         try {
+             System.out.println(j.getDouble("howard"));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+         System.out.print("Exception: ");
+         try {
+             System.out.println(j.put(null, "howard"));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+	}
+	public static void try3Method(JSONArray a) {//mio
+		 System.out.print("Exception: ");
+         try {
+             System.out.println(a.getDouble(0));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+         System.out.print("Exception: ");
+         try {
+             System.out.println(a.get(-1));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+         System.out.print("Exception: ");
+         try {
+             System.out.println(a.put(Double.NaN));
+         } catch (Exception e) {
+             System.out.println(e);
+         }
+	}
+	public static void try4Method(JSONObject j) {//mio
+		 System.out.print("Exception: ");
+         try {
+         	j = XML.toJSONObject("<a><b>    ");
+         } catch (Exception e) {
+         	System.out.println(e);
+         }            
+         System.out.print("Exception: ");
+         try {
+         	j = XML.toJSONObject("<a></b>    ");
+         } catch (Exception e) {
+         	System.out.println(e);
+         }            
+         System.out.print("Exception: ");
+         try {
+         	j = XML.toJSONObject("<a></a    ");
+         } catch (Exception e) {
+         	System.out.println(e);
+         }
+	}
+	public static void try5Method(JSONArray ja,String s,JSONArray a) {//mio
+		 System.out.print("Exception: ");
+         try {            	
+         	ja = new JSONArray(new Object());
+         	System.out.println(ja.toString());
+         } catch (Exception e) {
+         	System.out.println(e);
+         }
 
-    	Obj obj = new Obj("A beany object", 42, true);
-        
-        try {     
+         System.out.print("Exception: ");
+         try {            	
+         	s = "[)";
+         	a = new JSONArray(s);
+         	System.out.println(a.toString());
+         } catch (Exception e) {
+         	System.out.println(e);
+         }
+
+         System.out.print("Exception: ");
+         try {            	
+             s = "<xml";
+             ja = JSONML.toJSONArray(s);
+             System.out.println(ja.toString(4));
+         } catch (Exception e) {
+         	System.out.println(e);
+         }
+	}
+	public static void try6Method(String s, JSONArray ja, JSONArray j) {//mio
+		System.out.print("Exception: ");
+        try {            	
+            s = "<right></wrong>";
+            ja = JSONML.toJSONArray(s);
+            System.out.println(ja.toString(4));
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+
+        System.out.print("Exception: ");
+        try {            	
+            s = "{\"koda\": true, \"koda\": true}";
+            j = new JSONObject(s);
+            System.out.println(j.toString(4));
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+	}
+	public static void try7Method(JSONStringer jj,String s) {//mio
+		 System.out.print("Exception: ");
+         try {            	
+             jj = new JSONStringer();
+             s = jj
+ 	            .object()
+ 	                .key("bosanda")
+ 	                .value("MARIE HAA'S")
+ 	                .key("bosanda")
+ 	                .value("MARIE HAA\\'S")
+ 	            .endObject()
+ 	            .toString();
+             System.out.println(j.toString(4));
+         } catch (Exception e) {
+         	System.out.println(e);
+         }
+     
+		
+	}
+	public static void tryMethod(String s,JSONArray a,JSONObject j,Object o, JSONStringers jj) {//mio
+		try {     
             s = "[0.1]";
             a = new JSONArray(s);
             System.out.println(a.toString());
@@ -534,145 +670,51 @@ public class Test {
             System.out.println("\nTesting Exceptions: ");
 
             System.out.print("Exception: ");
-            try {
-                a = new JSONArray("[\n\r\n\r}");
-                System.out.println(a.toString());
-            } catch (Exception e) {
-                System.out.println(e);
-            }
             
-            System.out.print("Exception: ");
-            try {
-                a = new JSONArray("<\n\r\n\r      ");
-                System.out.println(a.toString());
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            try1Method(a);
             
-            System.out.print("Exception: ");
-            try {
-                a = new JSONArray();
-                a.put(Double.NEGATIVE_INFINITY);
-                a.put(Double.NaN);
-                System.out.println(a.toString());
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(j.getDouble("stooge"));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(j.getDouble("howard"));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(j.put(null, "howard"));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(a.getDouble(0));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(a.get(-1));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-                System.out.println(a.put(Double.NaN));
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {
-            	j = XML.toJSONObject("<a><b>    ");
-            } catch (Exception e) {
-            	System.out.println(e);
-            }            
-            System.out.print("Exception: ");
-            try {
-            	j = XML.toJSONObject("<a></b>    ");
-            } catch (Exception e) {
-            	System.out.println(e);
-            }            
-            System.out.print("Exception: ");
-            try {
-            	j = XML.toJSONObject("<a></a    ");
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
-            System.out.print("Exception: ");
-            try {            	
-            	ja = new JSONArray(new Object());
-            	System.out.println(ja.toString());
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
+            
+            try2Method(j);
+           
+            
+            try3Method(a);
+           
+            
+            try4Method(j);
+           
+            
+            try5Method(ja,s,a);
+           
 
-            System.out.print("Exception: ");
-            try {            	
-            	s = "[)";
-            	a = new JSONArray(s);
-            	System.out.println(a.toString());
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
+            try6Method(s,ja,j);
+            
 
-            System.out.print("Exception: ");
-            try {            	
-                s = "<xml";
-                ja = JSONML.toJSONArray(s);
-                System.out.println(ja.toString(4));
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
+            try7Method(jj,s);
+		} 
+		catch (Exception e) {
+	         System.out.println(e.toString());
+	     }
+	}
+    public static void main(String args[]) {
+        Iterator it;
+        JSONArray a;
+        JSONObject j;
+        JSONStringer jj;
+        Object o;
+        String s;
+        
+/** 
+ *  Obj is a typical class that implements JSONString. It also
+ *  provides some beanie methods that can be used to 
+ *  construct a JSONObject. It also demonstrates constructing
+ *  a JSONObject with an array of names.
+ */
+        objMethod();
+             
+        
 
-            System.out.print("Exception: ");
-            try {            	
-                s = "<right></wrong>";
-                ja = JSONML.toJSONArray(s);
-                System.out.println(ja.toString(4));
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
-
-            System.out.print("Exception: ");
-            try {            	
-                s = "{\"koda\": true, \"koda\": true}";
-                j = new JSONObject(s);
-                System.out.println(j.toString(4));
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
-
-            System.out.print("Exception: ");
-            try {            	
-                jj = new JSONStringer();
-                s = jj
-    	            .object()
-    	                .key("bosanda")
-    	                .value("MARIE HAA'S")
-    	                .key("bosanda")
-    	                .value("MARIE HAA\\'S")
-    	            .endObject()
-    	            .toString();
-                System.out.println(j.toString(4));
-            } catch (Exception e) {
-            	System.out.println(e);
-            }
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+    	Obj obj = new Obj("A beany object", 42, true);
+       
+    	tryMethod(s,a,j,o, jj);
     }
 }
