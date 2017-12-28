@@ -33,7 +33,7 @@ import java.lang.reflect.*;
 public class DataIn extends Thread {
 
 	PApplet parent;
-	private Method eventMethod;
+	private int eventMethod;//method->int
 	private Thread exmlThread;
 	private String remoteURL;
 	private int p;
@@ -242,41 +242,45 @@ public class DataIn extends Thread {
 	/**
 	 * Ignore -- this is where the threads are created.
 	 */
-	public void run() {
+	public void run() throws InterruptedException {
 	Lock lock = new Lock();
+	synchronized (lock) {
 		try {
 
 			dataIn = new In(remoteURL, pachubeAPIKey);
 			//System.out.println("Starting to run....");
+			try {
+				//System.out.println("Starting invoke method");
+				eventMethod.invoke(parent, new Object[] { this } );
+				//System.out.println("Finished invoke method");
+			} 
+			catch (Exception e) {
+				System.err.println("Problem running DataIn...");
+				System.out.println("Something was wrong");
+				eventMethod = null;
+			}
+			try {
+				while(lock != null) {
+					lock.wait();
+				}
+				
+			}
+			catch (Exception e) {
+				System.out.println("Descriptive error");//mio
+			}
+			
 			while (running){              
 
 				//System.out.println("Starting update");
 				dataIn.update();
 				//System.out.println("Finished update");
 
-
+				
 				if (eventMethod != null) {
-					try {
-						//System.out.println("Starting invoke method");
-						eventMethod.invoke(parent, new Object[] { this } );
-						//System.out.println("Finished invoke method");
-					} 
-					catch (Exception e) {
-						System.err.println("Problem running DataIn...");
-						System.out.println("Something was wrong");
-						eventMethod = null;
-					}
+				
 				}
 
 				//System.out.println("about to sleep.......");
-
-				try {
-					lock.wait();
-				}
-				catch (Exception e) {
-					System.out.println("Descriptive error");//mio
-				}
-
 				//System.out.println("finished sleeping......");
 
 			}
@@ -284,6 +288,8 @@ public class DataIn extends Thread {
 		} catch (Exception e) {
 			System.out.println("Descriptive error");//mio
 		}
+	}
+		
 	}
 
 	/**

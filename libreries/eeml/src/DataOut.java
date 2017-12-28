@@ -88,7 +88,7 @@ import java.lang.reflect.*;
 
 public class DataOut extends Thread {
 
-	private Method eventMethod;
+	private int eventMethod;//Method->int
 	private Thread exmlThread;
 	private int myport;
 	private Out dataOut;
@@ -301,24 +301,10 @@ public class DataOut extends Thread {
 	/**
 	 * Ignore.
 	 */
-	public void run() {
+	public void run() throws InterruptedException{
 		Lock lock = new Lock();
-		try {
-
-			while (running) {              
-
-				if ((eventMethod != null) & (dataOut.hasClient())) {
-					try {
-						eventMethod.invoke(parent, new Object[] { this } );
-						dataOut.serve();	                        
-					} 
-					catch (Exception e) {
-						System.err.println("Problem running DataOut...");
-						System.out.println("Something was wrong");
-						eventMethod = null;
-					}
-				}
-
+		synchronized(lock) {
+			try {
 				try {
 					lock.wait();
 				}
@@ -326,13 +312,29 @@ public class DataOut extends Thread {
 					System.err.println("DataOut: There was a problem sleeping.");
 					System.out.println("Something was wrong");
 				}
+				try {
+					eventMethod.invoke(parent, new Object[] { this } );
+					dataOut.serve();	                        
+				} 
+				catch (Exception e) {
+					System.err.println("Problem running DataOut...");
+					System.out.println("Something was wrong");
+					eventMethod = null;
+				}
+				while (running) { 
+					
 
+					if ((eventMethod != null) & (dataOut.hasClient())) {
+						
+					}
+				}
+
+			} catch (Exception e) {
+				System.err.println("DataOut: There was a problem running.");
+				System.out.println("Something was wrong");
 			}
-
-		} catch (Exception e) {
-			System.err.println("DataOut: There was a problem running.");
-			System.out.println("Something was wrong");
 		}
+		
 	}
 
 	/**

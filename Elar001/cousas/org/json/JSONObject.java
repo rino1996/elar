@@ -1,4 +1,4 @@
-//mio
+//TI ODIO. cit Vincenza
 package org.json;
 
 /*
@@ -27,9 +27,7 @@ SOFTWARE.
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,6 +67,10 @@ final class Null {
      * @throws JSONException If the value is an invalid number
      *  or if the key is null.
      */
+    
+    static class other{
+    	
+    
     public JSONObject accumulate(String key, Object value)
             throws JSONException {
         testValidity(value);
@@ -349,7 +351,10 @@ final class Null {
 	    }
     	return this;
     }
+    }
 
+static class Tagl {
+	
 
     /**
      * Determine if the value associated with the key is null or if there is
@@ -413,17 +418,20 @@ final class Null {
      * @return true if the object parameter is the JSONObject.NULL object
      *  or null.
      */
+    
     public class EQLFIXED{
-    	private int value;//mio
-    public boolean equals(Object obj) { if (o instanceof EQLFIXED) {
+    	public int value;//mio
+    public boolean equals(Object o) { if (o instanceof EQLFIXED) {
 
-  	  if (getClass () != obj.getClass ()) { 
-  	             return false; 
-  	        } else {
-  	           EQLFIXED temp = (EQLFIXED)obj;
+  	 // if (getClass () != obj.getClass ()) { 
+  	             //return false; 
+  	       // } else {
+  	           EQLFIXED temp = (EQLFIXED)o;
   	           return temp.value == value;
-  	         }
-        return obj == null || obj == this;
+  	         //}
+        //return obj == null || obj == this;
+    }else {
+    	return false;
     }
     }
     
@@ -448,6 +456,7 @@ final class Null {
         default:
             x.back();
             key = x.nextValue().toString();
+            break;
         }
     }
     
@@ -569,7 +578,7 @@ final class Null {
         return optInt(key, 0);
     }
 
-
+}
     /**
      * Get an optional int value associated with a key,
      * or the default if there is no such key or if the value is not a number.
@@ -728,7 +737,7 @@ final class Null {
          }
     }
     
-    private void populateMap(Object bean) {
+    public void populateMap(Object bean) {
         Class klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false. 
@@ -890,7 +899,7 @@ final class Null {
      * @return this.
      * @throws JSONException If the value is a non-finite number.
      */
-    private JSONObject putOpt(String key, Object value) throws JSONException {
+    public JSONObject putOpt(String key, Object value) throws JSONException {
         if (key != null && value != null) {
             put(key, value);
         }
@@ -937,7 +946,7 @@ final class Null {
           }
       }
       
-      private void whileMethod(char c, JSONTokener x, String key) {
+      public void whileMethod(char c, JSONTokener x, String key) {
       	  for(;;) {
                 c = x.nextClean(); //prende il carattere successivo della stringa saltando gli spazi bianchi
               
@@ -1166,6 +1175,8 @@ public class JSONObject {
 
  
 
+static class modifI{
+	
 
     
 
@@ -1371,7 +1382,7 @@ public void ifFloatThrowMethod(Object o) {
             }
         }
     }
-
+}
 
     /**
      * Produce a JSONArray containing the values of the members of this
@@ -1582,6 +1593,8 @@ public void ifFloatThrowMethod(Object o) {
 		// TODO Auto-generated method stub
 		
 	}
+static class Angor{
+	
 
 
 	/**
@@ -1727,6 +1740,7 @@ public void ifFloatThrowMethod(Object o) {
          Object f=new JSONObject(object);
          return (String)f;
      }
+}
      
      //__________________________________________________________
      static String wrap(Object object) {
@@ -1735,7 +1749,7 @@ public void ifFloatThrowMethod(Object o) {
                  return NULL;
              }
              
-             objectWrapMethod(object);
+            objectWrapMethod(object);
              
              collezioneWrapMethod(object);
             
