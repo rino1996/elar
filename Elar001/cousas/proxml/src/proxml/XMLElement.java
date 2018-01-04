@@ -55,7 +55,8 @@ public class XMLElement{
 	     * @related addAttribute ( )
 	     */
 	    public boolean hasAttributes () {
-	        return!attributes.isEmpty();
+	    	boolean ritorno = !attributes.isEmpty();
+	        return ritorno;
 	    }
 
 	    /**
@@ -72,7 +73,8 @@ public class XMLElement{
 	     * @related addAttribute ( )
 	     */
 	    public boolean hasAttribute (String key) {
-	        return attributes.containsKey(key);
+	    	boolean ritorno = attributes.containsKey(key);
+	        return ritorno;
 	    }
 		
 		/**
@@ -89,7 +91,8 @@ public class XMLElement{
 	     * @related addAttribute ( )
 		 */
 		public int countAttributes(){
-			return attributes.size();
+			int ritorno = attributes.size();
+			return ritorno;
 			
 		}
 		 /**
@@ -124,7 +127,8 @@ public class XMLElement{
 	    * @related hasChildren ( )
 		 */
 		public XMLElement getChild(int i){
-			return ((XMLElement)children.get(i));
+			XMLElement ritorno = ((XMLElement)children.get(i));
+			return ritorno;
 		}
 
 	    /**
@@ -154,7 +158,8 @@ public class XMLElement{
 	    * @related hasChildren ( )
 		 */
 		public int countChildren(){
-			return children.size();
+			int ritorno = children.size();
+			return ritorno;
 		}
 		/**
 	     * Use this method for a simple trace of the XML structure, beginning from a certain 
@@ -328,7 +333,9 @@ public class XMLElement{
 	 * @shortdesc Returns the name of the element.
 	 */
 	public String getName(){
-		if(isTextElement())return null;
+		if(isTextElement()) {
+			return null;
+		}
 		return element;
 	}
 	
@@ -339,7 +346,9 @@ public class XMLElement{
 	 * @shortdesc Returns the text of the element.
 	 */
 	public String getText(){
-		if(isTextElement())return element;
+		if(isTextElement()) {
+			return element;
+		}
 		return null;
 	}
 
@@ -467,6 +476,11 @@ public class XMLElement{
         attributes.put(key, value);
     }
 	
+    /**
+     * documentazione javaDoc
+     * @param key
+     * @param value
+     */
     public void addAttribute (String key, int value) {
 		addAttribute(key, value+"");
     }
@@ -508,7 +522,9 @@ public class XMLElement{
      * @shortdesc Returns the first child of the element.
      */
     public XMLElement firstChild(){
-   	 if(hasChildren())return getChild(0);
+   	 if(hasChildren()) {
+   		 return getChild(0);
+   	 }
    	 else return null;
     }
     
@@ -519,7 +535,9 @@ public class XMLElement{
      * @shortdesc Returns the last child of the element.
      */
     public XMLElement lastChild(){
-   	 if(hasChildren())return getChild(countChildren()-1);
+   	 if(hasChildren()) {
+   		 return getChild(countChildren()-1);
+   	 }
    	 else return null;
     }
     
@@ -530,7 +548,9 @@ public class XMLElement{
      * @shortdesc Returns the next sibling of the element.
      */
     public XMLElement nextSibling(){
-   	 if(parent == null)return null;
+   	 if(parent == null) {
+   		 return null;
+   	 }
    	 
    	 final int index = parent.children.indexOf(this);
    	 
@@ -548,7 +568,9 @@ public class XMLElement{
      * @shortdesc Returns the previous sibling of the element.
      */
     public XMLElement previousSibling(){
-   	 if(parent == null)return null;
+   	 if(parent == null) {
+   		 return null;
+   	 }
    	 
    	 final int index = parent.children.indexOf(this);
    	 
@@ -599,7 +621,7 @@ public class XMLElement{
 	 * @param position int, position where you want to insert the element
 	 */
    public void addChild (XMLElement el, int pos){
-	   int position;
+	   int position=0;
    	empty = false;
 		element.parent = this;
       children.add(position, element);
@@ -629,9 +651,9 @@ public class XMLElement{
      */
     public int getDepth () {
         int result = 0;
-        XMLElement[] children = getChildren();
-        for (int i = 0; i < children.length; i++) {
-            result = Math.max(result, children[i].getDepth());
+        XMLElement[] children1 = getChildren();//qui senza 1
+        for (int i = 0; i < children1.length; i++) {
+            result = Math.max(result, children1[i].getDepth());
         }
         return 1 + result;
     }
@@ -648,9 +670,9 @@ public class XMLElement{
      */
     public int countAllChildren () {
         int result = 0;
-		XMLElement[] children = getChildren();
-        for (int i = 0; i < children.length; i++) {
-            result += children[i].countAllChildren();
+		XMLElement[] children2 = getChildren();//qui senza 2
+        for (int i = 0; i < children2.length; i++) {
+            result += children2[i].countAllChildren();
         }
         return 1 + result;
     }
@@ -663,13 +685,13 @@ public class XMLElement{
      */
     public Vector getSpecificElements (String el) {
         Vector result = new Vector();
-		XMLElement[] children = getChildren();
-        for (int i = 0; i < children.length; i++) {
-            if (!children[i].isTextElement()) {
-                result.addAll(children[i].getSpecificElements(element));
+		XMLElement[] children3 = getChildren();//qui senza 3
+        for (int i = 0; i < children3.length; i++) {
+            if (!children3[i].isTextElement()) {
+                result.addAll(children3[i].getSpecificElements(element));
             }
-            if (children[i].element.equals(element)) {
-                result.add(children[i]);
+            if (children3[i].element.equals(element)) {
+                result.add(children3[i]);
             }
         }
         return result;
@@ -716,7 +738,9 @@ public class XMLElement{
 			result.append(attributes.get(key));
 			result.append("\"");
         }
-		if(empty)result.append("/>");
+		if(empty) {
+			result.append("/>");
+		}
 		else result.append(">");
         return result;
     }

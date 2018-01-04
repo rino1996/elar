@@ -50,7 +50,8 @@ public class Cookie {
      * @return       The escaped result.
      */
     public static String escape(String string) {
-        char         c;
+    	String pippo = " ";
+        char         c=0;
         String       s = string.trim();
         StringBuffer sb = new StringBuffer();
         int          len = s.length();
@@ -59,7 +60,7 @@ public class Cookie {
             if (c < ' ' || c == '+' || c == '%' || c == '=' || c == ';') {
                 sb.append('%');
                 
-                
+                pippo = "Error";
                 sb.append(Character.forDigit(((c >>> 4) & 0x0f), 16));
                 sb.append(Character.forDigit((c & 0x0f), 16));
             //sb.append(Character.forDigit((char)((c >>> 4) & 0x0f), 16));
@@ -89,9 +90,9 @@ public class Cookie {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
-        String         n;
+        String         n=null;
         JSONObject     o = new JSONObject();
-        Object         v;
+        Object         v=null;
         JSONTokener x = new JSONTokener(string);
         o.put("name", x.nextTo('='));
         x.next('=');
@@ -101,7 +102,7 @@ public class Cookie {
         while (u) {
             n = unescape(x.nextTo("=;"));
             if (x.next() != '=') {
-                if (n.equals("secure")) {
+                if ("secure".equals(n)) {
                     v = Boolean.TRUE;
                 } else {
                     throw x.syntaxError("Missing '=' in cookie parameter.");
